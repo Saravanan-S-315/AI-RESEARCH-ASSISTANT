@@ -29,8 +29,8 @@ Built with [Streamlit](https://streamlit.io/), [LangChain](https://python.langch
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/ai-research-assistant.git
-cd ai-research-assistant
+git clone https://github.com/Saravanan-S-315/AI-RESEARCH-ASSISTANT.git
+cd AI-RESEARCH-ASSISTANT
 ```
 
 ### 2. Install dependencies
