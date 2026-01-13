@@ -97,26 +97,3 @@ streamlit run app.py
     *   The **LangChain RAG chain** takes the user's question and the retrieved chunks and passes them to the **Llama 3 model** via the Groq API with a specific prompt.
     *   The LLM generates an answer based *only* on the provided context, which is then displayed to the user.
 
-## Credits
-
-This project uses and adapts code from:
-
-> **RESP: Research Papers Search**  
-> Ankit Pal (2021)  
-> [https://github.com/monk1337/resp](https://github.com/monk1337/resp)  
-> *Fetch Academic Research Papers from different sources including Google Scholar, ACL, ACM, PMLR etc based on keywords or title.*
-
-If you use this project in your own work, please also consider citing RESP:
-
-```bibtex
-@misc{Resp2021,
-  title = {RESP : Research Papers Search},
-  author = {Pal, Ankit},
-  year = {2021},
-  howpublished = {\url{https://github.com/monk1337/resp}},
-  note = {Fetch Academic Research Papers from different sources including Google Scholar, ACL, ACM, PMLR etc based on keywords or title}
-}
-```
-
----
-
