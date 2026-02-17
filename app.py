@@ -6,7 +6,7 @@ import os
 import retriver
 import streamlit as st
 from dotenv import load_dotenv
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
@@ -30,48 +30,30 @@ if "groq_api_key" not in st.session_state:
 st.title("AI Research Assistant 🤖")
 
 load_dotenv()
-ENV_GROQ_API = os.getenv("GROQ_API", "")
-SECRETS_GROQ_API = st.secrets.get("GROQ_API", "")
+GROQ_API = os.getenv("GROQ_API")
 DEFAULT_MODEL = os.getenv("GROQ_MODEL", "llama3-70b-8192")
 
+if not GROQ_API:
+    st.error("Missing GROQ_API environment variable. Add it to your deployment secrets.")
+    st.stop()
+
 
 @st.cache_resource
-def load_embedding() -> HuggingFaceEmbeddings:
-    return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-
-
-@st.cache_resource
-def load_llm(api_key: str, model_name: str) -> ChatGroq:
-    return ChatGroq(model=model_name, api_key=api_key)
+def load_model() -> tuple[ChatGroq, HuggingFaceEmbeddings]:
+    llm = ChatGroq(model=DEFAULT_MODEL, api_key=GROQ_API)
+    embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    return llm, embedding
 
 
 with st.sidebar:
     st.subheader("Settings")
     max_pages = st.slider("Search pages", min_value=1, max_value=5, value=1)
-    user_api_key = st.text_input(
-        "Groq API Key",
-        type="password",
-        value=st.session_state.groq_api_key,
-        placeholder="gsk_...",
-        help="You can provide the key here or via GROQ_API env / Streamlit secrets.",
-    )
-    if user_api_key != st.session_state.groq_api_key:
-        st.session_state.groq_api_key = user_api_key
-
-active_api_key = st.session_state.groq_api_key or ENV_GROQ_API or SECRETS_GROQ_API
-if not active_api_key:
-    st.info(
-        "Add your Groq API key in the sidebar, or set GROQ_API in environment/Streamlit secrets."
-    )
-    st.stop()
 
 with st.form(key="search_form"):
     query = st.text_input("Search Topic")
     search_button = st.form_submit_button(label="Search")
 
-llm = load_llm(active_api_key, DEFAULT_MODEL)
-embedding = load_embedding()
-
+llm, embedding = load_model()
 if search_button and query:
     st.session_state.last_query = query
     with st.spinner("Searching for papers..."):

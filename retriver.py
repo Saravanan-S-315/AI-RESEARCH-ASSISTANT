@@ -8,10 +8,12 @@ from typing import Any
 
 import requests
 from dotenv import load_dotenv
+from langchain.chains import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tqdm import tqdm
 
 load_dotenv()
@@ -73,7 +75,6 @@ def soup_html(output: requests.Response) -> list[dict[str, str]]:
     """Parse Semantic Scholar response."""
     final_result: list[dict[str, str]] = []
     output_json = output.json()
-
     for paper in output_json.get("results", []):
         result: dict[str, str] = {}
         result["title"] = paper.get("title", {}).get("text", "No title found")
@@ -134,14 +135,12 @@ def create_vectorstore(url: str, embedding: Any) -> FAISS:
 
 
 def get_answer(llm: Any, db: FAISS, query: str) -> str:
-    retrieved_docs = db.as_retriever(search_kwargs={"k": 4}).invoke(query)
-    context = "\n\n".join(doc.page_content for doc in retrieved_docs)
-
+    retriever = db.as_retriever()
     prompt = ChatPromptTemplate.from_template(
         """
-You are a research assistant.
-Answer the user's question clearly and factually using the context.
-If you don't know the answer, say that you don't know.
+You are research assisitant.
+Answer the user's question clearly and factually using the given context, but do not mention or reference the context explicitly.
+If you don't know the answer, just say that you don't know.
 
 <context>
 {context}
@@ -149,7 +148,7 @@ If you don't know the answer, say that you don't know.
 Question: {input}
 """
     )
-
-    messages = prompt.format_messages(context=context, input=query)
-    response = llm.invoke(messages)
-    return response.content
+    document_chain = create_stuff_documents_chain(llm, prompt)
+    retrieval_chain = create_retrieval_chain(retriever, document_chain)
+    response = retrieval_chain.invoke({"input": query})
+    return response["answer"]
