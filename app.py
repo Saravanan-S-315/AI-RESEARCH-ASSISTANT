@@ -24,6 +24,8 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "last_query" not in st.session_state:
     st.session_state.last_query = ""
+if "groq_api_key" not in st.session_state:
+    st.session_state.groq_api_key = ""
 
 st.title("AI Research Assistant 🤖")
 

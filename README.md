@@ -14,7 +14,13 @@ Built with Streamlit + LangChain + Groq + FAISS.
 - 🧠 Vector search powered by sentence-transformer embeddings and FAISS
 - 🚀 Deployment-ready setup with Docker, health checks, CI workflow, and environment templates
 
----
+```bash
+git clone https://github.com/Saravanan-S-315/AI-RESEARCH-ASSISTANT.git
+cd AI-RESEARCH-ASSISTANT
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
 ## Quickstart (Local)
 
@@ -83,7 +89,10 @@ The container includes a healthcheck against:
 - The app runs in headless mode and binds to `0.0.0.0:8501` in containers.
 - CI pipeline (`.github/workflows/ci.yml`) validates installation and source compilation on push/PR.
 
----
+On every push/PR, workflow `.github/workflows/ci.yml` runs:
+
+- dependency install from `requirements.txt`
+- python source compile check for `app.py` and `retriver.py`
 
 ## Project Structure
 
@@ -98,6 +107,8 @@ The container includes a healthcheck against:
 ├── docker-compose.yml
 └── .github/workflows/ci.yml
 ```
+
+After pushing, GitHub will re-run CI checks automatically.
 
 ---
 
