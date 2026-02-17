@@ -158,6 +158,26 @@ python -m compileall app.py retriver.py
 - Deploy via PR merge only (so CI always gates changes).
 - Roll back by redeploying the previous image tag.
 
+
+## Resolving PR Merge Conflicts
+
+If GitHub shows conflict markers for files like `.env.example`, `.github/workflows/ci.yml`, `README.md`, `app.py`, `requirements.txt`, and `retriver.py`, resolve with:
+
+```bash
+git fetch origin
+git checkout <your-pr-branch>
+git merge origin/main
+# fix conflicts in your editor
+
+git add .env.example .github/workflows/ci.yml README.md app.py requirements.txt retriver.py
+git commit -m "Resolve merge conflicts with main"
+git push
+```
+
+After pushing, GitHub will re-run CI checks automatically.
+
+---
+
 ## Troubleshooting
 
 - **Missing `GROQ_API`**: Provide a key in one of these places: sidebar `Groq API Key`, `.env` (`GROQ_API=...`), or Streamlit secrets.
